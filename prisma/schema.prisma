@@ -5,9 +5,80 @@ datasource db {
   shadowDatabaseUrl = env("POSTGRES_URL_NON_POOLING") // used for migrations
 }
 
-model User {
-  id           Int    @id @default(autoincrement())
-  fullName     String
-  email        String @unique
-  passwordHash String @unique
+generator client {
+  provider = "prisma-client-js"
 }
+
+model User {
+  id      Int      @id @default(autoincrement())
+  email   String   @unique
+  username    String?
+  passwordHash String @unique
+  refreshToken String? @unique
+  created_at   DateTime @default(now())
+  avatar       String?
+  role         Boolean
+  posts        Post[]
+  comments     Comment[]
+  likes        Like[]
+  bookmarks    BookMark[]
+  follows      Follow[]  @relation("FollowerRelation")
+  hashTags     HashTag[]
+}
+
+model Follow {
+  id                Int        @id @default(autoincrement())
+  following_user_id Int
+  followed_user_id  Int
+  created_at        DateTime
+  follower          User       @relation("FollowerRelation", fields: [following_user_id], references: [id])
+}
+
+model Post {
+  id          Int       @id @default(autoincrement())
+  title       String
+  body        String
+  user_id     Int
+  created_at  DateTime
+  views       Int
+  user        User      @relation(fields: [user_id], references: [id])
+  comments    Comment[]
+  likes       Like[]
+  hashTags    HashTag[]
+  bookmarks   BookMark[]
+}
+
+model Comment {
+  id          Int       @id @default(autoincrement())
+  user_id     Int
+  post_id     Int
+  body        String
+  created_at  DateTime
+  user        User      @relation(fields: [user_id], references: [id])
+  post        Post      @relation(fields: [post_id], references: [id])
+}
+
+model Like {
+  id          Int       @id @default(autoincrement())
+  user_id     Int
+  post_id     Int
+  user        User      @relation(fields: [user_id], references: [id])
+  post        Post      @relation(fields: [post_id], references: [id])
+}
+
+model HashTag {
+  id          Int       @id @default(autoincrement())
+  user_id     Int
+  post_id     Int
+  user        User      @relation(fields: [user_id], references: [id])
+  post        Post      @relation(fields: [post_id], references: [id])
+}
+
+model BookMark {
+  id          Int       @id @default(autoincrement())
+  user_id     Int
+  post_id     Int
+  user        User      @relation(fields: [user_id], references: [id])
+  post        Post      @relation(fields: [post_id], references: [id])
+}
+
