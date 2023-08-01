@@ -24,6 +24,7 @@ model User {
   bookmarks    BookMark[]
   follows      Follow[]  @relation("FollowerRelation")
   hashTags     HashTag[]
+  contacts     Contact[]
 }
 
 model Follow {
@@ -80,5 +81,13 @@ model BookMark {
   post_id     Int
   user        User      @relation(fields: [user_id], references: [id])
   post        Post      @relation(fields: [post_id], references: [id])
+}
+
+model Contact {
+    id  Int      @id @default(autoincrement())
+    body String 
+    to_user_id Int 
+    user_id Int
+    user        User   @relation(fields: [user_id], references: [id])
 }
 
